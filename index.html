@@ -810,12 +810,19 @@
             question.subject = editSubjectSelect.value;
             question.question = editQuestionText.value;
             
-            const imgSrc = editImagePreview.src;
-            if (imgSrc && (imgSrc.startsWith('http') || imgSrc.startsWith('data:image'))) {
-                question.imageUrl = imgSrc;
+            // --- FIX ---
+            // Use the visibility of the "Chưa có ảnh" (No image) text as the single source of truth.
+            // This avoids issues where browsers resolve an empty `src` attribute to the page's base URL.
+            const hasImage = editNoImageText.classList.contains('hidden');
+
+            if (hasImage) {
+                // If there is an image showing in the preview, save its src.
+                question.imageUrl = editImagePreview.src;
             } else {
+                // If the "No image" text is showing, delete the imageUrl property.
                 delete question.imageUrl;
             }
+            // --- END FIX ---
 
             question.answer = undefined;
             delete question.options;
